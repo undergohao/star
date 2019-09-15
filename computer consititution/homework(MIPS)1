@@ -1,0 +1,85 @@
+.data
+	LETTER : .asciiz  "Alpha\n","Bravo\n","China\n","Delta\n","Echo\n","Foxtrot\n","Golf\n","Hotel\n","India\n","Juliet\n","Kilo\n","Lima\n","Mary\n",
+			   "November\n","Oscar\n","Paper\n","Quebec\n","Research\n","Sierra\n","Tango\n","Uniform\n","Victor\n","Whisky\n","X-ray\n","Yankee\n",
+			   "Zulu\n"
+	
+	letter: .asciiz   "alpha\n","bravo\n","china\n","delta\n","echo\n","foxtrot\n","golf\n","hotel\n","lndia\n","juliet\n","kilo\n","lima\n","mary\n",
+			   "november\n","oscar\n","paper\n","quebec\n","research\n","sierra\n","tango\n","uniform\n","victor\n","whisky\n","x-ray\n","yankee\n",
+			   "zulu\n"
+	LETTER_offset: .word 0,7,14,21,28,34,43,49,56,63,71,77,83,89,99,106,113,121,131,139,146,155,163,171,178,186
+	number: .asciiz    "First\n","Second\n","Third\n","Fourth\n","Fifth\n","Sixth\n","Seventh\n","Eighth\n","Ninth\n","zero\n",
+	number_offset: .word 0,7,15,22,30,37,44,53,61,68
+	otherline :.asciiz 	"\n"
+	otherword: .asciiz	"*"
+.text
+	mian:
+	loop:	li $v0,12	#$v0=12输入字符
+		syscall
+		move $t0,$v0
+		
+		la $a0,otherline
+		li $v0,4
+		syscall
+		move $v0,$t0
+		
+		sub $t0,$v0,63
+		beqz $t0,exit
+		blt $v0,48,others
+		ble $v0,57,Num_print
+		blt $v0,65,others
+		ble $v0,90,LETTER_print
+		blt $v0,97,others
+		ble $v0,122,letter_print
+		bgt $v0,122,others
+		j loop
+		
+	Num_print:
+		sub $t0,$v0,48
+		sll $t0,$t0,2
+		la $t1,number_offset
+		add $t0,$t1,$t0
+		lw $t0,($t0)
+		la $t1,number
+		add $a0,$t1,$t0
+		li $v0,4 #输出字符串
+		syscall
+		j loop	
+		
+	LETTER_print:
+		sub $t0,$v0,65
+		sll $t0,$t0,2
+		la $t1,LETTER_offset
+		add $t0,$t1,$t0
+		lw $t0,($t0)
+		la $t1,LETTER
+		add $a0,$t0,$t1
+		li $v0,4
+		syscall
+		j loop
+	
+	letter_print:
+		sub $t0,$v0,97
+		sll $t0,$t0,2
+		la $t1,LETTER_offset
+		add $t0,$t1,$t0
+		lw $t0,($t0)
+		la $t1,letter
+		add $a0,$t0,$t1
+		li $v0,4
+		syscall
+		j loop		
+		
+	others:
+		la $a0,otherword
+		li $v0,11 
+		syscall	
+		
+		la $a0,otherline
+		li $v0,4
+		syscall
+		j loop
+		
+	exit:
+		li $v0,10 #退出程序
+		syscall
+		
